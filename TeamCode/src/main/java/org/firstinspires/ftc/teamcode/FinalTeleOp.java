@@ -1,76 +1,59 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
-import java.lang.Math;
 
 /**
- * Created by TigeRobots on 11/18/2016.
- *
- * Final TeleOp code for Ftc 2016-2017
- *
- * Next meeting I need to switch the motors on
- * their ports, either on the phones or on the
- * hardware because the motors are switched. Like
- * frontRight motor is actually frontLeft motor,
- * and vice versa. backRight is actually backLeft
- * and vice verca.
+ * Created by cicada02 on 12/9/16.
  */
-@TeleOp (name = "FinalTeleOp", group = "TeleOp")
+@TeleOp(name = "TeleOp", group = "TeleOp")
 public class FinalTeleOp extends LinearOpMode {
-
-    private ElapsedTime runtime = new ElapsedTime();
-
-
-    ModernRoboticsI2cGyro gyro;   // Hardware Device Object
-    int xVal, yVal, zVal = 0;     // Gyro rate Values
-    int heading = 0;              // Gyro integrated heading
-    int angleZ = 0;
-    boolean lastResetState = false;
-    boolean curResetState  = false;
 
     DcMotor frontRight;
     DcMotor frontLeft;
     DcMotor backRight;
     DcMotor backLeft;
+    DcMotor flicker;
+    DcMotor upTake;
+    DcMotor inTake;
 
+    Servo leftBeacon;
+    Servo rightBeacon;
+    Servo shooterGate;
 
+    double in                       = 0.2;
+    double out                      = 0.5;
+
+    double gateIn                   = 0.2;
+    double gateOut                  = 0.7;
+
+    double leftBeaconPosition;
+    boolean leftBeaconLastState;
+    boolean leftBeaconCurrentState;
+
+    double rightBeaconPosition;
+    boolean rightBeaconLastState;
+    boolean rightBeaconCurrentState;
+
+    double gatePosition;
+    boolean gateLastState;
+    boolean gateCurrentState;
 
     public void runOpMode(){
 
         roboInit();
 
-        // start calibrating the gyro.
-        telemetry.addData(">", "Gyro Calibrating. Do Not move!");
-        telemetry.update();
-        gyro.calibrate();
-
-        // make sure the gyro is calibrated.
-        while (!isStopRequested() && gyro.isCalibrating())  {
-            sleep(50);
-            idle();
-        }
-
-        telemetry.addData(">", "Gyro Calibrated.  Press Start.");
-        telemetry.update();
-
-        runtime.reset();
-
-        waitForStart();// Wait for the game to start (driver presses PLAY)
+        waitForStart();
 
         while (opModeIsActive()){
 
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
-            drive(gamepad1.right_stick_x, gamepad1.left_stick_x, gamepad1.left_stick_y);
-
-            gyrostuff();
-
-            debug();
+            drive();
+            beacons();
+            inTakeAndUpTake();
+            shoot();
 
             idle();
 
@@ -78,13 +61,30 @@ public class FinalTeleOp extends LinearOpMode {
 
     }
 
-    public void roboInit() {
+    public void roboInit(){
 
         frontRight = hardwareMap.dcMotor.get("FRONT_RIGHT");
-        frontLeft = hardwareMap.dcMotor.get("FRONT_LEFT");
-        backRight = hardwareMap.dcMotor.get("BACK_RIGHT");
-        backLeft = hardwareMap.dcMotor.get("BACK_LEFT");
-        gyro = (ModernRoboticsI2cGyro)hardwareMap.gyroSensor.get("GYRO");
+        frontLeft  = hardwareMap.dcMotor.get("FRONT_LEFT");
+        backRight  = hardwareMap.dcMotor.get("BACK_RIGHT");
+        backLeft   = hardwareMap.dcMotor.get("BACK_LEFT");
+        flicker    = hardwareMap.dcMotor.get("FLICKER");
+        upTake     = hardwareMap.dcMotor.get("UP_TAKE");
+        inTake     = hardwareMap.dcMotor.get("IN_TAKE");
+
+
+
+    }
+
+    public void drive(){
+
+        double turn         = gamepad1.right_stick_x;
+        double strafe       = gamepad1.left_stick_x;
+        double forward      = gamepad1.left_stick_y;
+
+        frontRight.setPower(constrain(turn + strafe - forward));
+        frontLeft.setPower(constrain(turn + strafe + forward));
+        backRight.setPower(constrain(turn - strafe - forward));
+
 
     }
 
@@ -98,62 +98,80 @@ public class FinalTeleOp extends LinearOpMode {
         return speed;
 
     }
+    
+    public void beacons(){
 
-    public void drive(double x, double y, double z) {
+        leftBeaconCurrentState  = gamepad1.b;
+        rightBeaconCurrentState = gamepad1.x;
 
-        double gyroOffset = 0.0;//(gyro.getIntegratedZValue()*0.03)-0.00;
+        if (leftBeaconCurrentState && !leftBeaconLastState && leftBeaconPosition == in){
 
-        frontRight.setPower(constrain((x + y + z)+gyroOffset));
-        frontLeft.setPower(constrain((x + y - z)+gyroOffset));
-        backRight.setPower(constrain((x - y + z)+gyroOffset));
-        backLeft.setPower(constrain((x - y - z)+gyroOffset));
+            leftBeaconPosition = out;
 
-        telemetry.addData("1", "Int. Ang. %03d", gyro.getIntegratedZValue());
-
-    }
-
-    public void debug(){
-
-
-
-    }
-
-    public void gyrostuff(){
-
-        // if the A and B buttons are pressed just now, reset Z heading.
-        curResetState = (gamepad1.a);
-        if(curResetState && !lastResetState)  {
-            gyro.resetZAxisIntegrator();
         }
-        lastResetState = curResetState;
 
-        // get the x, y, and z values (rate of change of angle).
-        xVal = gyro.rawX();
-        yVal = gyro.rawY();
-        zVal = gyro.rawZ();
+        else if (leftBeaconCurrentState && !leftBeaconLastState && leftBeaconPosition == out){
 
-        // get the heading info.
-        // the Modern Robotics' gyro sensor keeps
-        // track of the current heading for the Z axis only.
-        heading = gyro.getHeading();
-        angleZ  = gyro.getIntegratedZValue();
+            leftBeaconPosition = in;
 
-        telemetry.addData(">", "Press A & B to reset Heading.");
-        telemetry.addData("0", "Heading %03d", heading);
+        }
+        leftBeaconLastState = leftBeaconCurrentState;
+        leftBeacon.setPosition(leftBeaconPosition);
 
-        telemetry.addData("2", "X av. %03d", xVal);
-        telemetry.addData("3", "Y av. %03d", yVal);
-        telemetry.addData("4", "Z av. %03d", zVal);
-        telemetry.update();
+        if (rightBeaconCurrentState && !rightBeaconLastState && rightBeaconPosition == in){
+
+            rightBeaconPosition = out;
+
+        }
+        else if (rightBeaconCurrentState && !rightBeaconLastState && rightBeaconPosition == out){
+
+            rightBeaconPosition = in;
+
+        }
+        rightBeaconLastState = leftBeaconCurrentState;
+        rightBeacon.setPosition(leftBeaconPosition);
+
+    }
+    
+    public void inTakeAndUpTake(){
+        
+        if(gamepad1.a){
+            
+            inTake.setPower(0.5);
+            upTake.setPower(0.5);
+            
+        }
+        else if(gamepad1.y){
+            
+            inTake.setPower(-0.5);
+            upTake.setPower(-0.5);
+            
+        }
+        else{
+            
+            inTake.setPower(0.0);
+            upTake.setPower(0.0);
+            
+        }
+
     }
 
-    public void rotate() {
+    public void shoot(){
 
-        frontRight.setPower(constrain(gamepad1.right_stick_x));
-        frontLeft.setPower(constrain(gamepad1.right_stick_x));
-        backRight.setPower(constrain(gamepad1.right_stick_x));
-        backLeft.setPower(constrain(gamepad1.right_stick_x));
+        flicker.setPower(gamepad1.right_trigger);
+
+        gateCurrentState = gamepad1.right_bumper;
+
+        if (gateCurrentState && !gateLastState && gatePosition == gateIn){
+
+            gatePosition = out;
+
+        }
+        else if (gateCurrentState && !gateLastState && gatePosition == gateOut){
+
+            gatePosition = in;
+
+        }
 
     }
 }
-

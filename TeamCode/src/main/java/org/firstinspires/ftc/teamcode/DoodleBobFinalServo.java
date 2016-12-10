@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -9,6 +10,7 @@ import com.qualcomm.robotcore.hardware.Servo;
  * Created by TigeRobots on 12/8/2016.
  */
 @TeleOp(name = "FinalServo", group = "TeleOp")
+@Disabled
 public class DoodleBobFinalServo extends LinearOpMode {
 
     //Beacons
@@ -94,6 +96,14 @@ public class DoodleBobFinalServo extends LinearOpMode {
 
         gateOneCurrentState      = gamepad1.a;
         gateTwoCurrentState      = gamepad1.y;
+
+        double leftBeaconPosition;
+        double rightBeaconPosition;
+        double ballReleasePosition;
+        double forksReleasePosition;
+        double iFSePosition;
+        double gateOnePosition;
+        double gateTwoPosition;
 
     }
 
