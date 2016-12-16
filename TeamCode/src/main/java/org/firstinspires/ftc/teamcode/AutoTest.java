@@ -24,9 +24,6 @@ public class AutoTest extends OpMode{
     double distanceTraveled;
     double currentTime;
 
-    int    value = 1;
-    int    encoderValue = 0;
-
     @Override
     public void init(){
 
