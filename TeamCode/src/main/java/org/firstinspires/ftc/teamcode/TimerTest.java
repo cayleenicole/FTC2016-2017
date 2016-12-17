@@ -12,13 +12,26 @@ public class TimerTest extends LinearOpMode {
 
     public void runOpMode(){
 
-        gameTime();
+        time();
+        
+        while(opModeIsActive());
 
     }
 
-    public void gameTime(){
+    public void time(){
 
 
 
     }
+
+    /*
+    *
+    *
+    *
+    *
+    *
+    *
+    *
+    *
+    * */
 }

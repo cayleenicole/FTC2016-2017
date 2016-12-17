@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
@@ -8,9 +9,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 /**
  * Created by owner on 10/21/2016.
  */
-
+@Disabled
 @Autonomous(name = "AutoTest",group = "Auto")
-public class AutoTest extends OpMode{
+public class AutoTest extends OpMode {
 
     DcMotor frontLeft;
     DcMotor frontRight;
@@ -25,28 +26,31 @@ public class AutoTest extends OpMode{
     double currentTime;
 
     @Override
-    public void init(){
+    public void init() {
 
-        frontLeft  = hardwareMap.dcMotor.get("FRONT_LEFT");
+        frontLeft = hardwareMap.dcMotor.get("FRONT_LEFT");
         frontRight = hardwareMap.dcMotor.get("FRONT_RIGHT");
-        backLeft   = hardwareMap.dcMotor.get("BACK_LEFT");
-        backRight  = hardwareMap.dcMotor.get("BACK_RIGHT");
+        backLeft = hardwareMap.dcMotor.get("BACK_LEFT");
+        backRight = hardwareMap.dcMotor.get("BACK_RIGHT");
 
     }
+
     @Override
-    public void loop(){
+    public void loop() {
 
         autonomous();
-        debug();
+        /*debug();*/
 
     }
-    public void autonomous(){
+
+    public void autonomous() {
 
         switchCase();
     }
-    public void switchCase(){
 
-        switch(value){
+    public void switchCase() {
+
+        /*switch(value){
 
             case 1: drive(-0.5, 0.5, -0.5, 0.5, 2650 );
                 break;
@@ -95,27 +99,31 @@ public class AutoTest extends OpMode{
             value++;
         }
 
-    }
+    }*/
 
-    public void delay(double time){
+        /*public void delay ( double time){
 
-        currentTime = getRuntime();
+            currentTime = getRuntime();
 
-        while(getRuntime() - currentTime < time){
+            while (getRuntime() - currentTime < time) {
 
-            frontLeft.setPower(0.0);frontRight.setPower(0.0);backLeft.setPower(0.0);backRight.setPower(0.0);
+                frontLeft.setPower(0.0);
+                frontRight.setPower(0.0);
+                backLeft.setPower(0.0);
+                backRight.setPower(0.0);
+
+            }
 
         }
 
-    }
 
-
-    public void debug(){
+   /* public void debug(){
 
         telemetry.addData("FRONT_RIGHT", frontRight.getCurrentPosition());
         telemetry.addData("DISTANCE", distanceTraveled);
         telemetry.addData("WHAT_IS_COMPARED", Math.abs(frontRight.getCurrentPosition()-encoderValue));
         telemetry.addData("CASE", value);
 
+    }*/
     }
 }
