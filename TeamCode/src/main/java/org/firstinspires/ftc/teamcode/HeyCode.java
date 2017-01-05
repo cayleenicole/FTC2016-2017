@@ -10,8 +10,8 @@ import com.qualcomm.robotcore.hardware.GyroSensor;
 /**
  * Created by TigeRobots on 11/10/2016.
  */
-@TeleOp(name = "HeyCode" , group = "TeleOp")
 @Disabled
+@TeleOp(name = "HeyCode" , group = "TeleOp")
 public class HeyCode extends LinearOpMode {
      DcMotor frontRightmotor;
      DcMotor frontLeftmotor;

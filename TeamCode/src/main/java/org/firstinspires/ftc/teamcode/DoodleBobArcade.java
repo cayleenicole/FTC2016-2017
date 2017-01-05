@@ -8,8 +8,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 /**
  * Created by TigeRobots on 12/1/2016.
  */
-@TeleOp(name = "Arcade", group = "TeleOp")
 @Disabled
+@TeleOp(name = "Arcade", group = "TeleOp")
 public class DoodleBobArcade extends LinearOpMode {
 
     DcMotor frontRight;

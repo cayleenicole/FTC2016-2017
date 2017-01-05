@@ -1,11 +1,13 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 /**
  * Created by owner on 11/3/2016.
  */
+@Disabled
 @TeleOp(name = "WheelCheckTest", group = "TeleOp")
 public class WheelCheckTest extends OpMode {
 

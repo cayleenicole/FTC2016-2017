@@ -9,8 +9,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 /**
  * Created by TigeRobots on 12/8/2016.
  */
-@TeleOp(name = "FinalServo", group = "TeleOp")
 @Disabled
+@TeleOp(name = "FinalServo", group = "TeleOp")
 public class DoodleBobFinalServo extends LinearOpMode {
 
     //Beacons

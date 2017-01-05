@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -9,7 +10,8 @@ import com.qualcomm.robotcore.util.Range;
 /**
  * Created by TigeRobots on 12/2/2016.
  */
-@TeleOp(name = "Servo", group = "TeleOp")
+@Disabled
+@TeleOp(name = "S", group = "TeleOp")
 public class DoodleBobServo extends LinearOpMode {
 
     Servo servo;

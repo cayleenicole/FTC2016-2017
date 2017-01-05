@@ -11,8 +11,8 @@ import com.qualcomm.robotcore.util.Range;
  * This is a basic teleOp code to be used for
  * testing and debugging purposes
  */
-@TeleOp(name = "Mecanum", group = "TeleOp")
 @Disabled
+@TeleOp(name = "Mecanum", group = "TeleOp")
 public class DoodleBobMecanum extends LinearOpMode {
 
     DcMotor frontRight;

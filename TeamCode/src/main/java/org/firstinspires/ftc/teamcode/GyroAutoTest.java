@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 /**
  * Created by TigeRobots on 11/11/2016.
  */
+@Disabled
 @Autonomous(name = "GyroAutoTest", group = "Sensor")
 public class GyroAutoTest extends LinearOpMode {
 

@@ -9,8 +9,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 /**
  * Created by owner on 10/21/2016.
  */
-@Disabled
 @Autonomous(name = "AutoTest",group = "Auto")
+@Disabled
 public class AutoTest extends OpMode {
 
     DcMotor frontLeft;

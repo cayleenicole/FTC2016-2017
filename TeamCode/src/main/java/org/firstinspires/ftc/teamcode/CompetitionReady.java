@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -10,7 +11,7 @@ import com.qualcomm.robotcore.util.Range;
  * Created by cicada02 on 12/16/16.
  */
 @TeleOp(name = "CompetitionReady", group = "Cayles")
-public class CompTest extends LinearOpMode{
+public class CompetitionReady extends LinearOpMode{
 
     DcMotor frontRight;
     DcMotor frontLeft;
@@ -40,7 +41,7 @@ public class CompTest extends LinearOpMode{
     double  flickerSpeed;
     int     flickerPosition;
     int     currentflickerPosition;
-    int     previousflickerPosition;
+    int     previousFlickerPosition;
 
     //Gate
     double gatePosUp;
@@ -77,6 +78,8 @@ public class CompTest extends LinearOpMode{
 
         roboInit();
 
+        waitForStart();
+
         while (opModeIsActive()&& getRuntime() - currentRoundTime < roundTime){
 
             drive();
@@ -84,8 +87,7 @@ public class CompTest extends LinearOpMode{
             reload();
             inTakeAndUpTake();
             beacons();
-
-
+            debug();
 
         }
 
@@ -115,7 +117,9 @@ public class CompTest extends LinearOpMode{
         flickerSpeed = 1.0;
         flickerPosition = 3400;
         currentflickerPosition = flicker.getCurrentPosition();
-        previousflickerPosition = flicker.getCurrentPosition();
+        previousFlickerPosition = flicker.getCurrentPosition();
+
+        flicker.setDirection(DcMotor.Direction.REVERSE);
 
         //Gate
         gatePosUp = 0.0;
@@ -166,16 +170,16 @@ public class CompTest extends LinearOpMode{
         flickerButton = gamepad1.right_bumper;
         currentflickerPosition = flicker.getCurrentPosition();
         
-        if (currentflickerPosition - previousflickerPosition <= flickerPosition){
+        if (currentflickerPosition - previousFlickerPosition <= flickerPosition){
             
             speed = flickerSpeed;
             
         }
         
-        else if(currentflickerPosition - previousflickerPosition >= flickerPosition && flickerButton && !previousflickerButton){
+        else if(currentflickerPosition - previousFlickerPosition >= flickerPosition && flickerButton && !previousflickerButton){
 
             speed = flickerSpeed;
-            previousflickerPosition = currentflickerPosition;
+            previousFlickerPosition = currentflickerPosition;
             
         }
         
@@ -330,6 +334,8 @@ public class CompTest extends LinearOpMode{
         telemetry.addData("MOTOR_FRONT_LEFT", frontLeft.getPower());
         telemetry.addData("MOTOR_BACK_RIGHT", backRight.getPower());
         telemetry.addData("MOTOR_BACK_LEFT", backLeft.getPower());
+        telemetry.addData("MOTOR_FLICKER", flicker.getPower());
+        telemetry.addData("ENCODER_FLICKER", flicker.getCurrentPosition());
         telemetry.addData("GATE", gate.getPosition());
         telemetry.addData("LOAD_IS_READY", loadIsReady);
         telemetry.addData("CURRENT_TIME", (getRuntime() - currentTime));

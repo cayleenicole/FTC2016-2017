@@ -11,6 +11,7 @@ import java.lang.Math;
 /**
  * Created by owner on 11/10/2016.
  */
+@Disabled
 @TeleOp (name = "GyroTest", group = "Sensor")
 public class GyroTest extends LinearOpMode {
 

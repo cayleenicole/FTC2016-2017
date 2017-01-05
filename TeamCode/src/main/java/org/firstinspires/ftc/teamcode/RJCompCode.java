@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -10,7 +11,8 @@ import java.lang.Math;
 /**
  * Created by cicada02 on 12/16/16.
  */
-@TeleOp(name = "RJCODE", group = "TeleOp")
+@Disabled
+@TeleOp(name = "RJCOMPCODE", group = "TeleOp")
 public class RJCompCode extends LinearOpMode {
 
     //motor

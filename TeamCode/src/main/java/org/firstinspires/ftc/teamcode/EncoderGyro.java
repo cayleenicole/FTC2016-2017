@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
@@ -10,6 +11,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 /**
  * Created by TigeRobots on 11/26/2016.
  */
+@Disabled
 @Autonomous(name = "EncoderGyro",group = "Auto")
 public class EncoderGyro extends LinearOpMode {
 
