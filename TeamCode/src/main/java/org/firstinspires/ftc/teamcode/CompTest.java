@@ -18,27 +18,74 @@ public class CompTest extends LinearOpMode{
     DcMotor backLeft;
     DcMotor inTake;
     DcMotor upTake;
-    DcMotor shooter;
+    DcMotor flicker;
 
     Servo rightButton;
     Servo leftButton;
     Servo gate;
 
+    double currentTime;
+    double roundTime;
+    double currentRoundTime;
+
+    //Mecanum Drive
     double driveX;
     double driveY;
     double driveRotate;
     double expoCurve;
 
-    boolean shooterButton;
+    //Flicker
+    boolean flickerButton;
+    boolean previousflickerButton;
+    double  flickerSpeed;
+    int     flickerPosition;
+    int     currentflickerPosition;
+    int     previousflickerPosition;
+
+    //Gate
+    double gatePosUp;
+    double gatePosDown;
+    double gateTime;
+    boolean loadIsReady;
+    boolean gateButton;
+    boolean gateCurrentPress;
+    boolean gatePreviousPress;
+
+    //InTakeAndUpTake
+    boolean inUpTakeButton;
+    boolean inUpReverseButton;
+    boolean inUpTakeCurrent;
+    boolean inUpTakePrevious;
+    boolean isRunning;
+    
+    //Beacons
+    double rightBeaconPosIn;
+    double leftBeaconPosIn;
+    double rightBeaconPosOut;
+    double lBeaconPositionOut;
+    double rightButtonPos;
+    double leftButtonPos;
+    boolean rightBeaconButton;
+    boolean leftBeaconButton;
+    boolean rightBeaconCurrent;
+    boolean rightBeaconPrevious;
+    boolean leftBeaconCurrent;
+    boolean leftBeaconPrevious;
+    
 
     public void runOpMode(){
 
         roboInit();
 
-        while (opModeIsActive()){
+        while (opModeIsActive()&& getRuntime() - currentRoundTime < roundTime){
 
             drive();
-            shooter();
+            flicker();
+            reload();
+            inTakeAndUpTake();
+            beacons();
+
+
 
         }
 
@@ -46,17 +93,58 @@ public class CompTest extends LinearOpMode{
 
     public void roboInit(){
 
+        //Drive Motors
         frontRight  = hardwareMap.dcMotor.get("FRONT_RIGHT");
         frontLeft   = hardwareMap.dcMotor.get("FRONT_LEFT");
         backRight   = hardwareMap.dcMotor.get("BACK_RIGHT");
         backLeft    = hardwareMap.dcMotor.get("BACK_LEFT");
+
+        //Intake, Uptake, & Flicker
         inTake      = hardwareMap.dcMotor.get("INTAKE");
         upTake      = hardwareMap.dcMotor.get("UPTAKE");
-        shooter     = hardwareMap.dcMotor.get("SHOOTER");
+        flicker     = hardwareMap.dcMotor.get("SHOOTER");
 
+        //Servos
         rightButton    = hardwareMap.servo.get("RIGHT_BUTTON");
         leftButton     = hardwareMap.servo.get("LEFT_BUTTON");
         gate           = hardwareMap.servo.get("LOAD_FRONT");
+
+        //Flicker
+        flickerButton = false;
+        previousflickerButton = false;
+        flickerSpeed = 1.0;
+        flickerPosition = 3400;
+        currentflickerPosition = flicker.getCurrentPosition();
+        previousflickerPosition = flicker.getCurrentPosition();
+
+        //Gate
+        gatePosUp = 0.0;
+        gatePosDown = 1.0;
+        gateTime = 0.3;
+        loadIsReady = false;
+        gateButton = false;
+        gateCurrentPress = false;
+        gatePreviousPress = false;
+
+        //Intake and Uptake
+        inUpTakeButton = false;
+        inUpReverseButton = false;
+        isRunning = false;
+
+        //BEACON BUTTON VARIABLES
+        leftBeaconPosIn = 0.3;
+        lBeaconPositionOut = 0.75;
+        rightBeaconPosIn = 0.75;
+        rightBeaconPosOut = 0.3; 
+        rightButtonPos = rightBeaconPosIn;
+        leftButtonPos = leftBeaconPosIn;
+        leftBeaconButton = false;
+        rightBeaconButton = false;
+        leftBeaconCurrent = false;
+        rightBeaconCurrent = false;
+
+        roundTime = 120.0;
+        currentRoundTime = 0.0;
 
     }
 
@@ -72,11 +160,138 @@ public class CompTest extends LinearOpMode{
         backLeft.setPower(expo(constrain(driveRotate - driveY  - driveX),expoCurve));
 
     }
-    public void shooter(){
+    public void flicker(){
 
+        double speed;
+        flickerButton = gamepad1.right_bumper;
+        currentflickerPosition = flicker.getCurrentPosition();
+        
+        if (currentflickerPosition - previousflickerPosition <= flickerPosition){
+            
+            speed = flickerSpeed;
+            
+        }
+        
+        else if(currentflickerPosition - previousflickerPosition >= flickerPosition && flickerButton && !previousflickerButton){
 
+            speed = flickerSpeed;
+            previousflickerPosition = currentflickerPosition;
+            
+        }
+        
+        else{
+            
+            speed = 0.0;
+            
+        }
+
+        previousflickerButton = flickerButton;
+
+        flicker.setPower(speed);
+        
+    }
+
+    public void reload(){
+
+        gateButton = gamepad1.left_bumper;
+        gateCurrentPress = gateButton;
+
+        if (gateCurrentPress && !gatePreviousPress) {
+
+            loadIsReady = true;
+            currentTime = getRuntime();
+
+        }
+
+        if (loadIsReady) {
+
+            delayServoPosition(gateTime, gate, gatePosUp, gatePosDown, loadIsReady);
+
+        } else if (!loadIsReady) {
+            gate.setPosition(gatePosDown);
+        }
+
+        gatePreviousPress = gateCurrentPress;
 
     }
+
+    public void inTakeAndUpTake(){
+
+        inUpTakeButton = gamepad1.a;
+        inUpReverseButton = gamepad1.y;
+        inUpTakeCurrent = inUpTakeButton;
+
+        if (inUpTakeCurrent && !inUpTakePrevious && !isRunning && !gamepad1.y && !gamepad1.start) {
+
+            isRunning = true;
+        }
+        else if (inUpTakeCurrent && !inUpTakePrevious && isRunning && !gamepad1.y) {
+
+            isRunning = false;
+
+        }
+
+        inUpTakePrevious = inUpTakeCurrent;
+
+        if (isRunning && !inUpReverseButton) {
+
+            inTake.setPower(1.0);
+            upTake.setPower(1.0);
+
+        } else if (!isRunning && !inUpReverseButton) {
+
+            inTake.setPower(0.0);
+            upTake.setPower(0.0);
+
+        }
+
+        if (inUpReverseButton) {
+
+            inTake.setPower(-1.0);
+            upTake.setPower(-1.0);
+
+        }
+
+    }
+
+    public void beacons(){
+
+        leftBeaconButton = gamepad1.x;
+        rightBeaconButton = gamepad1.b;
+
+        leftBeaconCurrent = leftBeaconButton;
+        rightBeaconCurrent = rightBeaconButton;
+
+        if (leftBeaconCurrent && !leftBeaconPrevious && leftButton.getPosition() == leftBeaconPosIn) {
+
+            leftButtonPos = lBeaconPositionOut;
+
+        } 
+        else if (leftBeaconCurrent && !leftBeaconPrevious && leftButton.getPosition() == lBeaconPositionOut) {
+
+            leftButtonPos = leftBeaconPosIn;
+
+        }
+        
+        if (rightBeaconCurrent && !rightBeaconPrevious && rightButton.getPosition() == rightBeaconPosIn) {
+
+            rightButtonPos = rightBeaconPosOut;
+
+        }
+        else if (rightBeaconCurrent && !rightBeaconPrevious && rightButton.getPosition() == rightBeaconPosOut) {
+
+            rightButtonPos = rightBeaconPosIn;
+
+        }
+
+        leftBeaconPrevious = leftBeaconCurrent;
+        rightBeaconPrevious = rightBeaconCurrent;
+
+        rightButton.setPosition(rightButtonPos);
+        leftButton.setPosition(leftButtonPos);
+
+    }
+
 
     double expo(double x, double a){
 
@@ -96,4 +311,29 @@ public class CompTest extends LinearOpMode{
         return speed;
 
     }
+
+    boolean delayServoPosition(double time, Servo servo1, double position1, double position2, boolean isReady) {
+
+        if (getRuntime() - currentTime < time) {
+            servo1.setPosition(position1);
+        } else {
+            servo1.setPosition(position2);
+            isReady = false;
+        }
+
+        return isReady;
+    }
+
+    public void debug() {
+
+        telemetry.addData("MOTOR_FRONT_RIGHT", frontRight.getPower());
+        telemetry.addData("MOTOR_FRONT_LEFT", frontLeft.getPower());
+        telemetry.addData("MOTOR_BACK_RIGHT", backRight.getPower());
+        telemetry.addData("MOTOR_BACK_LEFT", backLeft.getPower());
+        telemetry.addData("GATE", gate.getPosition());
+        telemetry.addData("LOAD_IS_READY", loadIsReady);
+        telemetry.addData("CURRENT_TIME", (getRuntime() - currentTime));
+        telemetry.update();
+    }
+
 }
