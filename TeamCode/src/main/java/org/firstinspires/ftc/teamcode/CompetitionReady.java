@@ -147,6 +147,7 @@ public class CompetitionReady extends LinearOpMode{
         leftBeaconCurrent = false;
         rightBeaconCurrent = false;
 
+        //Time
         roundTime = 120.0;
         currentRoundTime = 0.0;
 
@@ -158,6 +159,7 @@ public class CompetitionReady extends LinearOpMode{
         driveY      = gamepad1.left_stick_y;
         driveX      = gamepad1.left_stick_x;
 
+        //This is where you drive the robot
         frontRight.setPower(expo(constrain(driveRotate + driveY + driveX),expoCurve));
         frontLeft.setPower(expo(constrain(driveRotate - driveY + driveX),expoCurve));
         backRight.setPower(expo(constrain(driveRotate + driveY - driveX),expoCurve));
@@ -169,7 +171,7 @@ public class CompetitionReady extends LinearOpMode{
         double speed;
         flickerButton = gamepad1.right_bumper;
         currentflickerPosition = flicker.getCurrentPosition();
-        
+
         if (currentflickerPosition - previousFlickerPosition <= flickerPosition){
             
             speed = flickerSpeed;
