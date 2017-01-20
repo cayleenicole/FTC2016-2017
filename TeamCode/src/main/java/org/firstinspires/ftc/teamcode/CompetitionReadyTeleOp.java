@@ -1,8 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
@@ -10,9 +10,12 @@ import com.qualcomm.robotcore.util.Range;
 /**
  * Created by cicada02 on 12/16/16.
  */
-@TeleOp(name = "CompetitionReady", group = "Cayles")
-public class CompetitionReady extends LinearOpMode{
+@TeleOp(name = "TeleOp", group = "Cayles")
+public class CompetitionReadyTeleOp extends LinearOpMode{
 
+    ColorSensor beaconColor;
+
+    //Motors\\
     DcMotor frontRight;
     DcMotor frontLeft;
     DcMotor backRight;
@@ -21,29 +24,32 @@ public class CompetitionReady extends LinearOpMode{
     DcMotor upTake;
     DcMotor flicker;
 
+    //Servos\\
     Servo rightButton;
     Servo leftButton;
     Servo gate;
 
+    //Time\\
     double currentTime;
     double roundTime;
     double currentRoundTime;
 
-    //Mecanum Drive
+    //Mecanum Drive\\
     double driveX;
     double driveY;
     double driveRotate;
     double expoCurve;
 
-    //Flicker
+    //Flicker\\
     boolean flickerButton;
     boolean previousflickerButton;
+    boolean initShot;
     double  flickerSpeed;
     int     flickerPosition;
     int     currentflickerPosition;
     int     previousFlickerPosition;
 
-    //Gate
+    //Gate\\
     double gatePosUp;
     double gatePosDown;
     double gateTime;
@@ -52,14 +58,14 @@ public class CompetitionReady extends LinearOpMode{
     boolean gateCurrentPress;
     boolean gatePreviousPress;
 
-    //InTakeAndUpTake
+    //InTakeAndUpTake\\
     boolean inUpTakeButton;
     boolean inUpReverseButton;
     boolean inUpTakeCurrent;
     boolean inUpTakePrevious;
     boolean isRunning;
     
-    //Beacons
+    //Beacons\\
     double rightBeaconPosIn;
     double leftBeaconPosIn;
     double rightBeaconPosOut;
@@ -79,7 +85,7 @@ public class CompetitionReady extends LinearOpMode{
         roboInit();
 
         waitForStart();
-
+        //This is my loop. Everything in the loop will run, while the conditions are true\\
         while (opModeIsActive()&& getRuntime() - currentRoundTime < roundTime){
 
             drive();
@@ -93,27 +99,31 @@ public class CompetitionReady extends LinearOpMode{
 
     }
 
+    //This where I initialize my motors, servos, and variables\\
     public void roboInit(){
 
-        //Drive Motors
+        beaconColor = hardwareMap.colorSensor.get("BEACON_COLOR");
+
+        //Drive Motors\\
         frontRight  = hardwareMap.dcMotor.get("FRONT_RIGHT");
         frontLeft   = hardwareMap.dcMotor.get("FRONT_LEFT");
         backRight   = hardwareMap.dcMotor.get("BACK_RIGHT");
         backLeft    = hardwareMap.dcMotor.get("BACK_LEFT");
 
-        //Intake, Uptake, & Flicker
+        //Intake, Uptake, & Flicker\\
         inTake      = hardwareMap.dcMotor.get("INTAKE");
         upTake      = hardwareMap.dcMotor.get("UPTAKE");
         flicker     = hardwareMap.dcMotor.get("SHOOTER");
 
-        //Servos
+        //Servos\\
         rightButton    = hardwareMap.servo.get("RIGHT_BUTTON");
         leftButton     = hardwareMap.servo.get("LEFT_BUTTON");
         gate           = hardwareMap.servo.get("LOAD_FRONT");
 
-        //Flicker
+        //Flicker\\
         flickerButton = false;
         previousflickerButton = false;
+        initShot = false;
         flickerSpeed = 1.0;
         flickerPosition = 3400;
         currentflickerPosition = flicker.getCurrentPosition();
@@ -121,21 +131,21 @@ public class CompetitionReady extends LinearOpMode{
 
         flicker.setDirection(DcMotor.Direction.REVERSE);
 
-        //Gate
+        //Gate\\
         gatePosUp = 0.0;
         gatePosDown = 1.0;
-        gateTime = 0.3;
+        gateTime = 0.5;
         loadIsReady = false;
         gateButton = false;
         gateCurrentPress = false;
         gatePreviousPress = false;
 
-        //Intake and Uptake
+        //Intake and Uptake\\
         inUpTakeButton = false;
         inUpReverseButton = false;
         isRunning = false;
 
-        //BEACON BUTTON VARIABLES
+        //BEACON BUTTON VARIABLES\\
         leftBeaconPosIn = 0.3;
         lBeaconPositionOut = 0.75;
         rightBeaconPosIn = 0.75;
@@ -147,7 +157,7 @@ public class CompetitionReady extends LinearOpMode{
         leftBeaconCurrent = false;
         rightBeaconCurrent = false;
 
-        //Time
+        //Time\\
         roundTime = 120.0;
         currentRoundTime = 0.0;
 
@@ -155,11 +165,12 @@ public class CompetitionReady extends LinearOpMode{
 
     public void drive(){
 
+        //This is stating what variable is what\\
         driveRotate = gamepad1.right_stick_x;
         driveY      = gamepad1.left_stick_y;
         driveX      = gamepad1.left_stick_x;
 
-        //This is where you drive the robot
+        //This is where you drive the robot. We created our own equation to drive the mecanums\\
         frontRight.setPower(expo(constrain(driveRotate + driveY + driveX),expoCurve));
         frontLeft.setPower(expo(constrain(driveRotate - driveY + driveX),expoCurve));
         backRight.setPower(expo(constrain(driveRotate + driveY - driveX),expoCurve));
@@ -172,19 +183,26 @@ public class CompetitionReady extends LinearOpMode{
         flickerButton = gamepad1.right_bumper;
         currentflickerPosition = flicker.getCurrentPosition();
 
-        if (currentflickerPosition - previousFlickerPosition <= flickerPosition){
+        if(flickerButton){
+
+            initShot = true;
+
+        }
+
+        //This is where the flicker goes to its starting positions\\
+        if (currentflickerPosition - previousFlickerPosition <= flickerPosition && initShot){
             
             speed = flickerSpeed;
             
         }
-        
+        //This is where you hit the button and the flicker shoots.\\
         else if(currentflickerPosition - previousFlickerPosition >= flickerPosition && flickerButton && !previousflickerButton){
 
             speed = flickerSpeed;
             previousFlickerPosition = currentflickerPosition;
             
         }
-        
+        //If neither case is true, then the motor is just off.\\
         else{
             
             speed = 0.0;
@@ -341,7 +359,9 @@ public class CompetitionReady extends LinearOpMode{
         telemetry.addData("GATE", gate.getPosition());
         telemetry.addData("LOAD_IS_READY", loadIsReady);
         telemetry.addData("CURRENT_TIME", (getRuntime() - currentTime));
+        telemetry.addData("Color_Red", beaconColor.red());
         telemetry.update();
+
     }
 
 }
